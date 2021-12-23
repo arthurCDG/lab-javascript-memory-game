@@ -1,3 +1,5 @@
+import { MemoryGame } from './memory.js';
+
 const cards = [
   { name: 'aquaman', img: 'aquaman.jpg' },
   { name: 'batman', img: 'batman.jpg' },
@@ -38,14 +40,60 @@ window.addEventListener('load', (event) => {
     `;
   });
 
+  memoryGame.shuffleCards();
+
   // Add all the divs to the HTML
   document.querySelector('#memory-board').innerHTML = html;
 
   // Bind the click event of each element to a function
   document.querySelectorAll('.card').forEach((card) => {
     card.addEventListener('click', () => {
-      // TODO: write some code here
-      console.log(`Card clicked: ${card}`);
+      // console.log(card.getAttribute('data-card-name'));
+      card.firstElementChild.classList.toggle('back');
+      card.firstElementChild.classList.toggle('front');
+      card.lastElementChild.classList.toggle('back');
+      card.lastElementChild.classList.toggle('front');
+
+      if (!document.querySelector('.returned')) {
+        card.classList.add('returned');
+        console.log('Premier if');
+      } else if (
+        memoryGame.checkIfPair(
+          document.querySelector('.returned').getAttribute('data-card-name'),
+          card.getAttribute('data-card-name')
+        )
+      ) {
+        console.log('Deuxième if');
+        document.querySelector('.returned').classList.toggle('blocked');
+        document.querySelector('.returned').classList.toggle('returned');
+        card.classList.toggle('blocked');
+      } else {
+        setTimeout(() => {
+          console.log('Troisième if');
+          document
+            .querySelector('.returned')
+            .firstElementChild.classList.toggle('back');
+          document
+            .querySelector('.returned')
+            .firstElementChild.classList.toggle('front');
+          document
+            .querySelector('.returned')
+            .lastElementChild.classList.toggle('back');
+          document
+            .querySelector('.returned')
+            .lastElementChild.classList.toggle('front');
+          document.querySelector('.returned').classList.toggle('returned');
+          card.firstElementChild.classList.toggle('back');
+          card.firstElementChild.classList.toggle('front');
+          card.lastElementChild.classList.toggle('back');
+          card.lastElementChild.classList.toggle('front');
+        }, 1000);
+      }
+      document.getElementById('pairs-clicked').innerText =
+        memoryGame.pairsClicked;
+      document.getElementById('pairs-guessed').innerText =
+        memoryGame.pairsGuessed;
+      if (memoryGame.checkIfFinished()) return alert('You won!');
     });
   });
 });
